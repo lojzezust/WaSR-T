@@ -5,3 +5,6 @@ __pycache__/
 
 # Virtual envs
 venv/
+
+# Project specific
+/output/

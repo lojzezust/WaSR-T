@@ -158,18 +158,18 @@ class WaSRTDecoder(nn.Module):
         return output
 
     def clear_state(self):
-        self.fmm_out.clear_state()
+        self.tcm.clear_state()
 
     def sequential(self):
         """Switch to sequential mode."""
 
-        self.fmm_out.sequential()
+        self.tcm.sequential()
 
         return self
 
     def unrolled(self):
         """Switch to unrolled mode."""
 
-        self.fmm_out.unrolled()
+        self.tcm.unrolled()
 
         return self
