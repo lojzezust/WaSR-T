@@ -3,7 +3,7 @@
 
 This is the official PyTorch implementation of the [WaSR-T network](https://arxiv.org/abs/2203.05352) [[1](#ref-wasrt)]. Contains scripts for training and running the network and weights pretrained on the MaSTr1325 [[2](#ref-mastr)] (and MaSTr1478) dataset. 
 
-Our work will be presented at IROS 2022.
+Our work will be presented at the *IROS 2022* conference in Kyoto, Japan.
 
 TODO: example image/gif
 
@@ -135,7 +135,7 @@ If you use this code, please cite our paper:
 @InProceedings{Zust2022Temporal,
   title={Temporal Context for Robust Maritime Obstacle Detection},
   author={{\v{Z}}ust, Lojze and Kristan, Matej},
-  booktitle={IROS},
+  booktitle={2022 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
   year={2022}
 }
 ```
