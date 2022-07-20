@@ -138,7 +138,7 @@ class WaSRTDecoder(nn.Module):
         )
 
         # Temporal Context Module
-        self.tcm = L.TemporalContextModule(2048, hist_len=5)
+        self.tcm = L.TemporalContextModule(2048, hist_len=5, sequential=sequential)
 
         self.ffm = L.FeatureFusionModule(256, 2048, 1024)
         self.aspp = L.ASPPv2(1024, [6, 12, 18, 24], num_classes)

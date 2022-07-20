@@ -19,7 +19,7 @@ from wasr_t.data.sampling import DatasetRandomSampler, DistributedSamplerWrapper
 
 
 # Enable/disable WANDB logging
-WANDB_LOGGING = True
+WANDB_LOGGING = False
 
 DEVICE_BATCH_SIZE = 3
 TRAIN_FILE = os.path.expanduser('~/data/datasets/mastr1325/train.yaml')
@@ -34,10 +34,8 @@ RANDOM_SEED = None
 OUTPUT_DIR = 'output'
 PRETRAINED_DEEPLAB = True
 PRECISION = 32
-ARCHITECTURE = 'wasr_resnet101_imu'
 MONITOR_VAR = 'val/iou/obstacle'
 MONITOR_VAR_MODE = 'max'
-OBJECT_PASTE_P = 0.75
 ADDITONAL_SAMPLES_RATIO = 0.5
 
 
