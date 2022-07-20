@@ -1,5 +1,5 @@
 # WaSR-T: Temporal Context for Robust Maritime Obstacle Detection
-[[`arxiv`](https://arxiv.org/abs/2203.05352)] [[`BibTeX`](#cite)] [[`weights`](#cite)] [[`data`](#cite)]
+[[`arxiv`](https://arxiv.org/abs/2203.05352)] [[`BibTeX`](#cite)] [[`weights`](#weights)] [[`data`](#data)]
 
 This is the official PyTorch implementation of the [WaSR-T network](https://arxiv.org/abs/2203.05352) [[1](#ref-wasrt)]. Contains scripts for training and running the network and weights pretrained on the MaSTr1325 [[2](#ref-mastr)] (and MaSTr1478) dataset. 
 
@@ -120,6 +120,12 @@ Logged metrics (loss, validation accuracy, validation IoU) can be inspected usin
 ```bash
 tensorboard --logdir output/logs/model_name
 ```
+
+## <a name="data"></a>Data
+
+- MaSTr1325 context frames: TODO
+- MaSTr1478 extension data: TODO
+- MODS context frames: TODO
 
 ## <a name="cite"></a>Citation
 
