@@ -37,7 +37,7 @@ model = wasr_temporal_resnet101(num_classes=3)
 ```
 
 WaSR-T model operates in two different modes: 
-- **sequential**: An online mode, useful for inference. Only one frame is processed at a time. Features of the previous frames are stored in a circular buffer. The frames must be processed one after the other, thus the batch size must be 1.
+- **sequential**: An online mode, useful for inference. Only one frame is processed at a time. Features of the previous frames are stored in a circular buffer. The frames must be processed one after the other, thus the batch size must be 1. The context buffer is initialized from copies of the first frame in the sequence.
 - **unrolled**: An offline mode, used during training. Each sample consists of a target frame and the required previous frames. Supports batched processing.
 
 You can switch between the two modes by calling `sequential()` or `unrolled()` on the model.
@@ -45,10 +45,13 @@ You can switch between the two modes by calling `sequential()` or `unrolled()` o
 Example of sequential operation:
 ```python
 model = model.sequential()
+
+model.clear_state() # Clear the temporal buffer of the model
 for image in sequence:
     # image is a [1,3,H,W] tensor
     output = model({'image': image})
 ```
+**Note**: If you run inference on multiple sequences you must call `clear_state()` on the model to clear the buffer before moving to a new sequence. Otherwise the context of the last frames of the previous sequence will be used, which may lead to faulty predictions.
 
 Example of unrolled operation:
 ```python
