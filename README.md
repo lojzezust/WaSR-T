@@ -5,7 +5,11 @@ This is the official PyTorch implementation of the [WaSR-T network](https://arxi
 
 Our work will be presented at the *IROS 2022* conference in Kyoto, Japan.
 
-TODO: example image/gif
+<p align="center">
+    <img src="figures/comparison.gif" alt="Comparison WaSR - WaSR-T" width="960px">
+    Comparison between WaSR (single-frame) and WaSR-T (temporal context).
+</p>
+
 
 ## About WaSR-T
 
