@@ -44,10 +44,8 @@ def wasr_temporal_resnet101(num_classes=3, pretrained=True, sequential=False):
 
 class WaSRT(nn.Module):
     """WaSR-T model"""
-    def __init__(self, backbone, decoder, backbone_grad_steps=3, imu=False, sequential=False):
+    def __init__(self, backbone, decoder, backbone_grad_steps=3, sequential=False):
         super(WaSRT, self).__init__()
-
-        self.imu = imu
 
         self.backbone = backbone
         self.decoder = decoder
@@ -91,9 +89,6 @@ class WaSRT(nn.Module):
         # Stack tensors
         for f in extract_feats:
             feats_hist[f] = torch.stack(feats_hist[f], 1)
-
-        if self.imu:
-            features['imu_mask'] = x['imu_mask']
 
         x = self.decoder(features, feats_hist)
 

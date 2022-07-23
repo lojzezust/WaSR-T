@@ -8,7 +8,7 @@ import pytorch_lightning as pl
 from .loss import focal_loss, water_obstacle_separation_loss
 from .metrics import PixelAccuracy, ClassIoU
 
-NUM_EPOCHS = 50
+NUM_EPOCHS = 100
 LEARNING_RATE = 1e-6
 MOMENTUM = 0.9
 WEIGHT_DECAY = 1e-6

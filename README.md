@@ -7,7 +7,7 @@ Our work will be presented at the *IROS 2022* conference in Kyoto, Japan.
 
 <p align="center">
     <img src="figures/comparison.gif" alt="Comparison WaSR - WaSR-T">
-    Comparison between WaSR (single-frame) and WaSR-T (temporal context).
+    Comparison between WaSR (single-frame) and WaSR-T (temporal context) on hard examples.
 </p>
 
 

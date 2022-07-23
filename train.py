@@ -85,8 +85,6 @@ def get_arguments(input_args=None):
                         help="Name of the model. Used to create model and log directories inside the output directory.")
     parser.add_argument("--pretrained-weights", type=str, default=None,
                         help="Path to the pretrained weights to be used.")
-    parser.add_argument("--architecture", type=str, choices=M.models, default=ARCHITECTURE,
-                        help="Which architecture to use.")
     parser.add_argument("--monitor-metric", type=str, default=MONITOR_VAR,
                         help="Validation metric to monitor for early stopping and best model saving.")
     parser.add_argument("--monitor-metric-mode", type=str, default=MONITOR_VAR_MODE, choices=['min', 'max'],
