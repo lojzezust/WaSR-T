@@ -6,7 +6,7 @@ This is the official PyTorch implementation of the [WaSR-T network](https://arxi
 Our work will be presented at the *IROS 2022* conference in Kyoto, Japan.
 
 <p align="center">
-    <img src="figures/comparison.gif" alt="Comparison WaSR - WaSR-T" width="960px">
+    <img src="figures/comparison.gif" alt="Comparison WaSR - WaSR-T">
     Comparison between WaSR (single-frame) and WaSR-T (temporal context).
 </p>
 
@@ -16,7 +16,7 @@ Our work will be presented at the *IROS 2022* conference in Kyoto, Japan.
 WaSR-T is a temporal extension of the established [WaSR model](https://github.com/lojzezust/WaSR) [[3](#ref-wasr)] for maritime obstacle detection. It harnesses the temporal context of recent image frames to reduce the ambiguity on reflections and improve the overall robustness of predictions.
 
 <p align="center">
-    <img src="figures/architecture.png" alt="WaSR-T architecture" width="960px">
+    <img src="figures/architecture.png" alt="WaSR-T architecture">
 </p>
 
 The target and context (i.e. previous) frames are encoded using a shared encoder network. To extract the temporal context from the past frames, we apply a 3D convolution operation over the temporal dimension. The 3D convolution is able to extract discriminative information about local texture changes over the recent frames. The resulting temporal context is concatenated with the target frame features and passed to the decoder, which produces the final predictions.
