@@ -102,7 +102,7 @@ Currently available pretrained model weights. All models are evaluated on the MO
 
 To train your own models, use the `train.py` script. For example, to reproduce the results of our experiments use the following steps:
 
-1. Download and prepare the [MaSTr1325 dataset](https://box.vicos.si/borja/viamaro/index.html#mastr1325) (images and GT masks). Also download the context frames for the MaSTr1325 images [here](TODO).
+1. Download and prepare the [MaSTr1325 dataset](https://box.vicos.si/borja/viamaro/index.html#mastr1325) (images and GT masks). Also download the context frames for the MaSTr1325 images [here](#data).
 2. Edit the dataset configuration files (`configs/mastr_1325_train.yaml`, `configs/mastr1325_extra` and `configs/mastr1325_val.yaml`) so that they correctly point to the dataset directories.
 3. Use the `train.py` to train the network.
 
@@ -111,10 +111,10 @@ export CUDA_VISIBLE_DEVICES=0,1,2,3 # GPUs to use
 python train.py \
 --train_config configs/mastr1325_train.yaml \
 --val_config configs/mastr1325_val.yaml \
---model_name my_wasr \
 --validation \
---batch_size 4 \
---epochs 50
+--model_name my_wasr \
+--batch_size 2 \
+--epochs 100
 ```
 
 
@@ -130,9 +130,9 @@ tensorboard --logdir output/logs/model_name
 
 ## <a name="data"></a>Data
 
+We extend the MaSTr1325 dataset by providing the context frames (5 preceding frames). We also extend the dataset with additional hard examples to form MaSTr1478.
 - MaSTr1325 context frames: TODO
-- MaSTr1478 extension data: TODO
-- MODS context frames: TODO
+- MaSTr1478 extension data: Coming soon
 
 ## <a name="cite"></a>Citation
 
