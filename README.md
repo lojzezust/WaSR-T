@@ -94,8 +94,8 @@ Currently available pretrained model weights. All models are evaluated on the MO
 
 | backbone   | T | dataset   | F1       | F1$_{D}$ | weights                                                                            |
 |------------|---|-----------|----------|----------|------------------------------------------------------------------------------------|
-| ResNet-101 | 5 | MaSTr1325 | 93.7     | 87.3     | [link](https://github.com/lojzezust/WaSR/releases/download/weights/wasr_rn101.pth) |
-| ResNet-101 | 5 | MaSTr1478 | **94.4** | **93.6** | [link](https://github.com/lojzezust/WaSR/releases/download/weights/wasr_rn101.pth) |
+| ResNet-101 | 5 | MaSTr1325 | 93.7     | 87.3     | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1325.pth) |
+| ResNet-101 | 5 | MaSTr1478 | **94.4** | **93.6** | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1478.pth) |
 
 
 ## Model training
@@ -131,7 +131,7 @@ tensorboard --logdir output/logs/model_name
 ## <a name="data"></a>Data
 
 We extend the MaSTr1325 dataset by providing the context frames (5 preceding frames). We also extend the dataset with additional hard examples to form MaSTr1478.
-- MaSTr1325 context frames: TODO
+- MaSTr1325 context frames: [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/mastr1325_context.zip)
 - MaSTr1478 extension data: Coming soon
 
 ## <a name="cite"></a>Citation
