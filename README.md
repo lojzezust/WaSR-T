@@ -132,7 +132,7 @@ tensorboard --logdir output/logs/model_name
 
 We extend the MaSTr1325 dataset by providing the context frames (5 preceding frames). We also extend the dataset with additional hard examples to form MaSTr1478.
 - MaSTr1325 context frames: [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/mastr1325_context.zip)
-- MaSTr1478 extension data: Coming soon
+- MaSTr1478 extension data: [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/mastr153.zip)
 
 ## <a name="cite"></a>Citation
 
