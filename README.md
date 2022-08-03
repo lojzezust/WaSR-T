@@ -92,7 +92,7 @@ ffmpeg -i video.mp4 sequence_images/frame_%05d.jpg
 
 Currently available pretrained model weights. All models are evaluated on the MODS benchmark [[4](#ref-mods)]. F1 scores overall and inside the danger zone are reported in the table.
 
-| backbone   | T | dataset   | F1       | F1$_{D}$ | weights                                                                            |
+| backbone   | T | dataset   | F1       | F1<sub>D</sub> | weights                                                                            |
 |------------|---|-----------|----------|----------|------------------------------------------------------------------------------------|
 | ResNet-101 | 5 | MaSTr1325 | 93.7     | 87.3     | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1325.pth) |
 | ResNet-101 | 5 | MaSTr1478 | **94.4** | **93.6** | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1478.pth) |
