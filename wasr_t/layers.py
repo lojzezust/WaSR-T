@@ -158,7 +158,7 @@ class ASPPv2(nn.Module):
 
         rates = tuple(atrous_rates)
         for rate in rates:
-            modules.append(ASPPv2Conv(in_channels, out_channels, rate, bias=True))
+            modules.append(ASPPv2Conv(in_channels, out_channels, rate, bias=biased, relu=relu))
 
         self.convs = nn.ModuleList(modules)
 

@@ -22,8 +22,8 @@ from wasr_t.data.sampling import DatasetRandomSampler, DistributedSamplerWrapper
 WANDB_LOGGING = False
 
 DEVICE_BATCH_SIZE = 3
-TRAIN_FILE = os.path.expanduser('~/data/datasets/mastr1325/train.yaml')
-VAL_FILE = os.path.expanduser('~/data/datasets/mastr1325/val.yaml')
+TRAIN_CONFIG = 'configs/mastr1325_train.yaml'
+VAL_CONFIG = 'configs/mastr1325_val.yaml'
 NUM_CLASSES = 3
 PATIENCE = 5
 LOG_STEPS = 20
@@ -38,6 +38,8 @@ MONITOR_VAR = 'val/iou/obstacle'
 MONITOR_VAR_MODE = 'max'
 ADDITONAL_SAMPLES_RATIO = 0.5
 
+HIST_LEN = 5
+BACKBONE_GRAD_STEPS = 2
 
 def get_arguments(input_args=None):
     """Parse all the arguments provided from the CLI.
@@ -48,15 +50,15 @@ def get_arguments(input_args=None):
     parser = argparse.ArgumentParser(description="DeepLab-ResNet Network", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--batch-size", type=int, default=DEVICE_BATCH_SIZE,
                         help="Minibatch size (number of samples) used on each device.")
-    parser.add_argument("--train-file", type=str, default=TRAIN_FILE,
-                        help="Path to the file containing the MaSTr training dataset mapping.")
-    parser.add_argument("--additional-train-file", type=str, default=None,
-                    help="Additional training file.")
+    parser.add_argument("--train-config", type=str, default=TRAIN_CONFIG,
+                        help="Path to the file containing the training dataset config.")
+    parser.add_argument("--additional-train-config", type=str, default=None,
+                    help="Additional training config file. Can be used to sample from MaSTr1325 and MaSTr153 (additional) with equal probability.")
     parser.add_argument("--additional-samples-ratio", type=float, default=ADDITONAL_SAMPLES_RATIO,
                     help="(if < 1): Percentage of the batch to fill with additional training samples.\n"
                          "(if >= 1): Number of additional training samples in a batch.")
-    parser.add_argument("--val-file", type=str, default=VAL_FILE,
-                        help="Path to the file containing the MaSTr val dataset mapping.")
+    parser.add_argument("--val-config", type=str, default=VAL_CONFIG,
+                        help="Path to the file containing the val dataset config.")
     parser.add_argument("--mask-dir", type=str, default=None,
                         help="Override the original mask dir. Relative path from the dataset root.")
     parser.add_argument("--validation", action="store_true",
@@ -93,6 +95,11 @@ def get_arguments(input_args=None):
                         help="Disable on-the-fly image augmentation of the dataset.")
     parser.add_argument("--precision", default=PRECISION, type=int, choices=[16,32],
                         help="Floating point precision.")
+    parser.add_argument("--hist-len", default=HIST_LEN, type=int,
+                        help="Number of past frames to be considered in addition to the target frame (context length).")
+    parser.add_argument("--backbone-grad-steps", default=BACKBONE_GRAD_STEPS, type=int,
+                        help="How far into the past the backbone gradients are propagated. 1 means gradients are only propagated through the target frame.")
+
     parser.add_argument("--resume-from", type=str, default=None,
                         help="Resume training from specified checkpoint.")
 
@@ -119,14 +126,14 @@ class DataModule(pl.LightningDataModule):
         if self.args.mask_dir is not None:
             alternative_mask_subdir = self.args.mask_dir
 
-        train_ds = MaSTr1325Dataset(self.args.train_file, transform=transform,
+        train_ds = MaSTr1325Dataset(self.args.train_config, transform=transform,
                                     normalize_t=self.normalize_t, masks_subdir=alternative_mask_subdir)
 
         b_sampler = None
         # Additional training file (combining multiple datasets)
-        if self.args.additional_train_file is not None:
+        if self.args.additional_train_config is not None:
             orig_ds = train_ds
-            add_ds = MaSTr1325Dataset(self.args.additional_train_file, transform=transform,
+            add_ds = MaSTr1325Dataset(self.args.additional_train_config, transform=transform,
                                     normalize_t=self.normalize_t, masks_subdir=alternative_mask_subdir)
             train_ds = ConcatDataset([train_ds, add_ds])
             sample_ratio = self.args.additional_samples_ratio
@@ -159,7 +166,7 @@ class DataModule(pl.LightningDataModule):
     def val_dataloader(self):
         val_dl = None
         if self.args.validation:
-            val_ds = MaSTr1325Dataset(self.args.val_file, normalize_t=self.normalize_t, include_original=True)
+            val_ds = MaSTr1325Dataset(self.args.val_config, normalize_t=self.normalize_t, include_original=True)
             val_dl = DataLoader(val_ds, batch_size=self.args.batch_size, num_workers=self.args.workers)
 
         return val_dl
@@ -173,7 +180,7 @@ def train_wasrt(args):
     data = DataModule(args, normalize_t)
 
     # Get model
-    model = wasr_temporal_resnet101(num_classes=args.num_classes, pretrained=args.pretrained)
+    model = wasr_temporal_resnet101(num_classes=args.num_classes, pretrained=args.pretrained, hist_len=args.hist_len, backbone_grad_steps=args.backbone_grad_steps)
 
     if args.pretrained_weights is not None:
         print(f"Loading weights from: {args.pretrained_weights}")

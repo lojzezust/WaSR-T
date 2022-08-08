@@ -14,7 +14,7 @@ model_urls = {
     'deeplabv3_resnet101_coco': 'https://download.pytorch.org/models/deeplabv3_resnet101_coco-586e9e4e.pth'
 }
 
-def wasr_temporal_resnet101(num_classes=3, pretrained=True, sequential=False):
+def wasr_temporal_resnet101(num_classes=3, pretrained=True, sequential=False, backbone_grad_steps=2, hist_len=5):
     # Pretrained ResNet101 backbone
     backbone = resnet101(pretrained=True, replace_stride_with_dilation=[False, True, True])
     return_layers = {
@@ -25,9 +25,9 @@ def wasr_temporal_resnet101(num_classes=3, pretrained=True, sequential=False):
     }
     backbone = IntermediateLayerGetter(backbone, return_layers=return_layers)
 
-    decoder = WaSRTDecoder(num_classes, fpm_grad_steps=5, sequential=sequential)
+    decoder = WaSRTDecoder(num_classes, hist_len=hist_len, sequential=sequential)
 
-    model = WaSRT(backbone, decoder, backbone_grad_steps=2, sequential=sequential)
+    model = WaSRT(backbone, decoder, backbone_grad_steps=backbone_grad_steps, sequential=sequential)
 
     # Load pretrained DeeplabV3 weights (COCO)
     if pretrained:
@@ -44,7 +44,7 @@ def wasr_temporal_resnet101(num_classes=3, pretrained=True, sequential=False):
 
 class WaSRT(nn.Module):
     """WaSR-T model"""
-    def __init__(self, backbone, decoder, backbone_grad_steps=3, sequential=False):
+    def __init__(self, backbone, decoder, backbone_grad_steps=2, sequential=False):
         super(WaSRT, self).__init__()
 
         self.backbone = backbone
@@ -123,7 +123,7 @@ class WaSRT(nn.Module):
 
 
 class WaSRTDecoder(nn.Module):
-    def __init__(self, num_classes, fpm_grad_steps=3, sequential=False, sequential_hist_len=2):
+    def __init__(self, num_classes, hist_len=5, sequential=False):
         super(WaSRTDecoder, self).__init__()
 
         self.arm1 = L.AttentionRefinementModule(2048)
@@ -133,7 +133,7 @@ class WaSRTDecoder(nn.Module):
         )
 
         # Temporal Context Module
-        self.tcm = L.TemporalContextModule(2048, hist_len=5, sequential=sequential)
+        self.tcm = L.TemporalContextModule(2048, hist_len=hist_len, sequential=sequential)
 
         self.ffm = L.FeatureFusionModule(256, 2048, 1024)
         self.aspp = L.ASPPv2(1024, [6, 12, 18, 24], num_classes)
