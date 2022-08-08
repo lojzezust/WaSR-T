@@ -19,6 +19,7 @@ SEGMENTATION_COLORS = np.array([
 ], np.uint8)
 
 OUTPUT_DIR = 'output/predictions'
+HIST_LEN = 5
 
 def get_arguments():
     """Parse all the arguments provided from the CLI.
@@ -29,6 +30,8 @@ def get_arguments():
     parser = argparse.ArgumentParser(description="WaSR Network Sequential Inference")
     parser.add_argument("--sequence-dir", type=str, required=False,
                         help="Path to the directory containing frames of the input sequence.")
+    parser.add_argument("--hist-len", default=HIST_LEN, type=int,
+                        help="Number of past frames to be considered in addition to the target frame (context length). Must match the value used in training.")
     parser.add_argument("--weights", type=str, required=True,
                         help="Model weights file.")
     parser.add_argument("--output-dir", type=str, default=OUTPUT_DIR,
@@ -69,7 +72,7 @@ def predict_sequence(predictor, sequence_dir, output_dir):
 
 
 def run_inference(args):
-    model = wasr_temporal_resnet101(pretrained=False)
+    model = wasr_temporal_resnet101(pretrained=False, hist_len=args.hist_len)
     state_dict = load_weights(args.weights)
     model.load_state_dict(state_dict)
     model = model.sequential() # Enable sequential mode

@@ -117,6 +117,7 @@ python train.py \
 --epochs 100
 ```
 
+**Note:** Model training requires a large amount of GPU memory (>11 GB per GPU). If you use smaller GPUs, you can reduce the memory consumption by decreasing the number of backbone backpropagation steps (`--backbone-grad-steps`) or using a smaller context length (`--hist-len`).
 
 ### Logging and model weights
 
