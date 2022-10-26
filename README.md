@@ -109,11 +109,11 @@ To train your own models, use the `train.py` script. For example, to reproduce t
 ```bash
 export CUDA_VISIBLE_DEVICES=0,1,2,3 # GPUs to use
 python train.py \
---train_config configs/mastr1325_train.yaml \
---val_config configs/mastr1325_val.yaml \
+--train-config configs/mastr1325_train.yaml \
+--val-config configs/mastr1325_val.yaml \
 --validation \
---model_name my_wasr \
---batch_size 2 \
+--model-name my_wasr \
+--batch-size 2 \
 --epochs 100
 ```
 
