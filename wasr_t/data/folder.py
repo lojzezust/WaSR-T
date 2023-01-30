@@ -7,18 +7,20 @@ import torchvision.transforms.functional as TF
 class FolderDataset(torch.utils.data.Dataset):
     """Dataset wrapper for a general directory of images."""
 
-    def __init__(self, image_dir, normalize_t=None):
+    def __init__(self, image_dir, normalize_t=None, resize=None):
         """Creates the dataset.
 
         Args:
             image_dir (str): path to the image directory. Can contain arbitrary subdirectory structures.
             normalize_t (callable, optional): Transform used to normalize the images. Defaults to None.
+            resize (tuple, optional): Resize the input images to this size. No resizing if `None`.
         """
 
         self.image_dir = Path(image_dir)
         self.images = sorted([p.relative_to(image_dir) for p in Path(image_dir).glob('**/*.jpg')])
 
         self.normalize_t = normalize_t
+        self.resize = resize
 
     def __len__(self):
         return len(self.images)
@@ -36,6 +38,9 @@ class FolderDataset(torch.utils.data.Dataset):
         else:
             # Default: divide by 255
             img = TF.to_tensor(img)
+
+        if self.resize is not None:
+            img = TF.resize(img, self.resize[::-1])
 
 
         features = {
