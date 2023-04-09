@@ -157,3 +157,20 @@ If you use this code, please cite our paper:
 <a name="ref-wasr"></a>[3] Bovcon, B., & Kristan, M. (2021). WaSR--A Water Segmentation and Refinement Maritime Obstacle Detection Network. IEEE Transactions on Cybernetics
 
 <a name="ref-mods"></a>[4] Bovcon, B., Muhovič, J., Vranac, D., Mozetič, D., Perš, J., & Kristan, M. (2021). MODS -- A USV-oriented object detection and obstacle segmentation benchmark.
+
+
+## Mobile Inference
+These steps are relevant for the mobile inference neural network, which functions identically but has fewer parameters and is suitable for lower-resolution inference on the Jetson Nano.
+```
+# install requirements
+pip3 install -r requirements.txt
+
+# download weights (with gdown installed)
+gdown https://drive.google.com/file/d/1zU_9Ut5movnX8pI4XTOvfEBSQbgMZdvA
+
+# begin mobile inference (on folder dataset)
+python3 predict_sequential.py --weights lraspp_weights.ckpt --sequence-dir MaSTr153 --output-dir output --mobile
+
+# begin mobile inference (through gstreamer pipeline)
+python3 predict_gstreamer.py --weights lraspp_weights.ckpt
+```
