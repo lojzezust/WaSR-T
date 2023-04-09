@@ -10,6 +10,7 @@ from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 
 from wasr_t.wasr_t import wasr_temporal_resnet101
+from wasr_t.mobile_wasr_t import wasr_temporal_lraspp_mobilenetv3
 from wasr_t.train import LitModel
 from wasr_t.utils import MainLoggerCollection, Option
 from wasr_t.callbacks import ModelExport
@@ -102,6 +103,12 @@ def get_arguments(input_args=None):
 
     parser.add_argument("--resume-from", type=str, default=None,
                         help="Resume training from specified checkpoint.")
+    
+    parser.add_argument("--mobile", action='store_true',
+                    help="Use smaller network network for mobile inference.")
+    
+    parser.add_argument("--size", type=int, nargs=2,
+                    help='Resolution used for training, (Width, Height). Used like "--size 384 512".', default=[384,512])
 
     parser = LitModel.add_argparse_args(parser)
 
@@ -177,10 +184,18 @@ def train_wasrt(args):
     args.random_seed = pl.seed_everything(args.random_seed)
 
     normalize_t = PytorchHubNormalization()
+    if args.mobile:
+        normalize_t = T.Compose([
+            normalize_t,
+            T.Resize(tuple(args.size))
+        ])
     data = DataModule(args, normalize_t)
 
     # Get model
-    model = wasr_temporal_resnet101(num_classes=args.num_classes, pretrained=args.pretrained, hist_len=args.hist_len, backbone_grad_steps=args.backbone_grad_steps)
+    if args.mobile:
+        model = wasr_temporal_lraspp_mobilenetv3(num_classes=args.num_classes, pretrained=args.pretrained, hist_len=args.hist_len, backbone_grad_steps=args.backbone_grad_steps)
+    else:
+        model = wasr_temporal_resnet101(num_classes=args.num_classes, pretrained=args.pretrained, hist_len=args.hist_len, backbone_grad_steps=args.backbone_grad_steps)
 
     if args.pretrained_weights is not None:
         print(f"Loading weights from: {args.pretrained_weights}")
