@@ -138,7 +138,7 @@ def main():
             toc = time.time()
             print(f"\rInstantaneous FPS {(1.0 / (toc - tic)) :.2f}.", end='')
             tic = toc
-        cv2.waitKey(1)
+        time.sleep(0.0001)
     
     print("Video capture is closed.")
 
