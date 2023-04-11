@@ -52,8 +52,8 @@ def get_gstream_input() -> cv2.VideoCapture:
     return cap
 
 def get_gstream_output() -> cv2.VideoWriter:
-    pipeline_s = "appsrc ! videoconvert ! autovideosink sync=false"
-    # pipeline_s = "appsrc ! videoconvert ! x264enc ! flvmux ! filesink location=out.flv"
+    # pipeline_s = "appsrc ! videoconvert ! autovideosink sync=false"
+    pipeline_s = "appsrc ! videoconvert ! x264enc ! flvmux ! filesink location=out.flv"
     out = cv2.VideoWriter(pipeline_s,cv2.CAP_GSTREAMER, 0, fps, (width, height), True) 
     return out
 
