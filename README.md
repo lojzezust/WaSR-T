@@ -195,12 +195,12 @@ source ~/.bashrc
 
 # begin mobile inference (through gstreamer pipeline)
 # this takes in the camera stream and writes it to a file "out.flv"
-python3 predict_gstreamer.py --weights lraspp_weights.ckpt --fp16
+python3 predict_gstreamer.py --weights lraspp_weights.ckpt --fp16 --mobile --size 256 192
 ```
 
 The `predict_sequential.py` script can also be used on the mobile inference network as follows.
 ```
 # begin mobile inference (on folder dataset)
 # this functions similarly to predict_sequential.py on the full network
-python3 predict_sequential.py --weights lraspp_weights.ckpt --sequence-dir MaSTr153 --output-dir output --mobile --fp16
+python3 predict_sequential.py --weights lraspp_weights.ckpt --sequence-dir MaSTr153 --output-dir output --mobile --fp16 --size 256 192
 ``` 
