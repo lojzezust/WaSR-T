@@ -7,12 +7,11 @@ import cv2
 import time
 
 from wasr_t.data.transforms import PytorchHubNormalization
-from wasr_t.mobile_wasr_t import  wasr_temporal_lraspp_mobilenetv3
-from wasr_t.utils import load_weights
+from wasr_t.mobile_wasr_t import wasr_temporal_lraspp_mobilenetv3, wasr_temporal_resnet101
+from wasr_t.utils import load_weights, Option
 
-width = 256
-height = 192
-fps = int(30)
+SIZE = (256,192)
+FPS = int(30)
 
 # Colors corresponding to each segmentation class
 SEGMENTATION_COLORS = np.array([
@@ -38,12 +37,16 @@ def get_arguments():
                         help="Use half precision for inference.")
     parser.add_argument("--gpus", default=-1,type=int,
                         help="Number of gpus (or GPU ids) used for training.")
+    parser.add_argument("--mobile", action='store_true',
+                    help="Use smaller network network for mobile inference.")
+    parser.add_argument("--size", type=int, default=SIZE, nargs=2, help="Resize input frames to a specified size.")
     return parser.parse_args()
 
-def get_gstream_input() -> cv2.VideoCapture:
+def get_gstream_input(args) -> cv2.VideoCapture:
+    width, height = args.size
 
     # pipeline from webcam
-    pipeline = f"v4l2src device=/dev/video0 ! video/x-raw,width=640,height=480,framerate={fps}/1 ! videoconvert ! videoscale ! video/x-raw,format=BGR,width={width},height={height} ! appsink drop=true"
+    pipeline = f"v4l2src device=/dev/video0 ! video/x-raw,width=640,height=480,framerate={FPS}/1 ! videoconvert ! videoscale ! video/x-raw,format=BGR,width={width},height={height} ! appsink drop=true"
 
     # pipeline from local video
     # pipeline = f"filesrc location=MaSTr1325/images/wasrt_mobilenetv3_input.webm ! matroskademux ! vp9dec ! videoconvert ! videoscale ! video/x-raw,format=BGR,width={width},height={height} ! appsink drop=true"
@@ -51,14 +54,20 @@ def get_gstream_input() -> cv2.VideoCapture:
     cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
     return cap
 
-def get_gstream_output() -> cv2.VideoWriter:
+def get_gstream_output(args) -> cv2.VideoWriter:
+    width, height = args.size
+
     # pipeline_s = "appsrc ! videoconvert ! autovideosink sync=false"
     pipeline_s = "appsrc ! videoconvert ! x264enc ! flvmux ! filesink location=out.flv"
-    out = cv2.VideoWriter(pipeline_s,cv2.CAP_GSTREAMER, 0, fps, (width, height), True) 
+    out = cv2.VideoWriter(pipeline_s,cv2.CAP_GSTREAMER, 0, FPS, (width, height), True)
     return out
 
 def get_model(args):
-    model = wasr_temporal_lraspp_mobilenetv3(pretrained=False, hist_len=args.hist_len, sequential=True)
+    if args.mobile:
+        model = wasr_temporal_lraspp_mobilenetv3(pretrained=False, hist_len=args.hist_len, sequential=True)
+    else:
+        model = wasr_temporal_resnet101(pretrained=False, hist_len=args.hist_len, sequential=True)
+
     state_dict = load_weights(args.weights)
 
     # if PyTorch 2.0's torch.compile() function generated these weights, then we need to remove
@@ -95,6 +104,7 @@ class Inferencer:
             self.dtype = torch.float32
 
     def process_frame(self, frame : np.ndarray):
+        height,width,_ = frame.shape
 
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         tf = PytorchHubNormalization()
@@ -105,7 +115,7 @@ class Inferencer:
 
         with torch.inference_mode():
             probs = self.model({'image': frame})['out']
-        
+
         probs = TF.resize(probs, (height, width), interpolation=InterpolationMode.BILINEAR)
         out_class = probs.argmax(1).to(torch.uint8).squeeze().detach().cpu().numpy()
         pred_mask = SEGMENTATION_COLORS[out_class]
@@ -118,10 +128,10 @@ def main():
     print(f"Got arguments: {args}")
 
     print("Initializing GStreamer input.")
-    cap = get_gstream_input()
+    cap = get_gstream_input(args)
 
     print("Initializing GStreamer output.")
-    out = get_gstream_output()
+    out = get_gstream_output(args)
 
     print("Instantiating and compiling model.")
     model = get_model(args)
@@ -139,7 +149,7 @@ def main():
             print(f"\rInstantaneous FPS {(1.0 / (toc - tic)) :.2f}.", end='')
             tic = toc
         time.sleep(0.0001)
-    
+
     print("Video capture is closed.")
 
     # Release everything if job is finished

@@ -41,6 +41,7 @@ ADDITONAL_SAMPLES_RATIO = 0.5
 
 HIST_LEN = 5
 BACKBONE_GRAD_STEPS = 2
+SIZE = (384,512)
 
 def get_arguments(input_args=None):
     """Parse all the arguments provided from the CLI.
@@ -100,15 +101,12 @@ def get_arguments(input_args=None):
                         help="Number of past frames to be considered in addition to the target frame (context length).")
     parser.add_argument("--backbone-grad-steps", default=BACKBONE_GRAD_STEPS, type=int,
                         help="How far into the past the backbone gradients are propagated. 1 means gradients are only propagated through the target frame.")
-
     parser.add_argument("--resume-from", type=str, default=None,
                         help="Resume training from specified checkpoint.")
-    
     parser.add_argument("--mobile", action='store_true',
                     help="Use smaller network network for mobile inference.")
-    
     parser.add_argument("--size", type=int, nargs=2,
-                    help='Resolution used for training, (Width, Height). Used like "--size 384 512".', default=[384,512])
+                    help='Input resolution used for training (Width, Height). Used like "--size 512 384".', default=SIZE)
 
     parser = LitModel.add_argparse_args(parser)
 
@@ -184,11 +182,10 @@ def train_wasrt(args):
     args.random_seed = pl.seed_everything(args.random_seed)
 
     normalize_t = PytorchHubNormalization()
-    if args.mobile:
-        normalize_t = T.Compose([
-            normalize_t,
-            T.Resize(tuple(args.size))
-        ])
+    normalize_t = T.Compose([
+        normalize_t,
+        T.Resize(tuple(args.size[::-1]))
+    ])
     data = DataModule(args, normalize_t)
 
     # Get model

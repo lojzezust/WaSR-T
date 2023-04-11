@@ -9,6 +9,7 @@ from wasr_t.data.folder import FolderDataset
 from wasr_t.data.transforms import PytorchHubNormalization
 from wasr_t.inference import Predictor
 from wasr_t.wasr_t import wasr_temporal_resnet101
+from wasr_t.mobile_wasr_t import wasr_temporal_lraspp_mobilenetv3
 from wasr_t.utils import load_weights, Option
 
 # Colors corresponding to each segmentation class
@@ -20,7 +21,7 @@ SEGMENTATION_COLORS = np.array([
 
 OUTPUT_DIR = 'output/predictions'
 HIST_LEN = 5
-RESIZE = (512,384)
+SIZE = (512,384)
 
 def get_arguments():
     """Parse all the arguments provided from the CLI.
@@ -37,12 +38,14 @@ def get_arguments():
                         help="Model weights file.")
     parser.add_argument("--output-dir", type=str, default=OUTPUT_DIR,
                         help="Directory where the predictions will be stored.")
-    parser.add_argument("--resize", type=Option(int), default=RESIZE, nargs='+',
-                        help="Resize input images to a specified size. Use `none` for no resizing.")
     parser.add_argument("--fp16", action='store_true',
                         help="Use half precision for inference.")
     parser.add_argument("--gpus", default=-1,
                         help="Number of gpus (or GPU ids) used for training.")
+    parser.add_argument("--mobile", action='store_true',
+                    help="Use smaller network network for mobile inference.")
+    parser.add_argument("--size", type=Option(int), default=SIZE, nargs='+',
+                        help="Resize input images to a specified size. Use `none` for no resizing.")
     return parser.parse_args()
 
 def export_predictions(probs, batch, output_dir):
@@ -75,7 +78,11 @@ def predict_sequence(predictor, sequence_dir, output_dir, size):
 
 
 def run_inference(args):
-    model = wasr_temporal_resnet101(pretrained=False, hist_len=args.hist_len)
+    if args.mobile:
+        model = wasr_temporal_lraspp_mobilenetv3(pretrained=False, hist_len=args.hist_len)
+    else:
+        model = wasr_temporal_resnet101(pretrained=False, hist_len=args.hist_len)
+
     state_dict = load_weights(args.weights)
     model.load_state_dict(state_dict)
     model = model.sequential() # Enable sequential mode
@@ -84,8 +91,8 @@ def run_inference(args):
     output_dir = Path(args.output_dir)
 
     size = None
-    if args.resize[0] is not None:
-        size = args.resize
+    if args.size[0] is not None:
+        size = args.size
 
     predict_sequence(predictor, args.sequence_dir, output_dir, size=size)
 
