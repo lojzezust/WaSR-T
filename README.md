@@ -160,17 +160,47 @@ If you use this code, please cite our paper:
 
 
 ## Mobile Inference
-These steps are relevant for the mobile inference neural network, which functions identically but has fewer parameters and is suitable for lower-resolution inference on the Jetson Nano.
+A reduced-resolution, smaller version of the WaSR-T network can be run on a Jetson Nano embedded platform at around 13 FPS. The instructions below have been tested on the 4 GB original (pre-Orin) Jetson Nano developer kit and show the steps needed for real-time inference that streams to a file. By modifying the gstreamer pipeline in `predict_gstreamer.py`, the live segmentation results can be sent to other destinations for processing. The PyTorch installation instructions are adapted from [here](https://docs.ultralytics.com/yolov5/jetson_nano/#install-pytorch-and-torchvision).
+
 ```
-# install requirements
-pip3 install -r requirements.txt
+# install latest pip
+sudo apt-get install -y python3-pip
+pip3 install --upgrade pip
+
+# install torch v1.10.0
+cd ~
+sudo apt-get install -y libopenblas-base libopenmpi-dev
+wget https://nvidia.box.com/shared/static/fjtbno0vpo676a25cgvuqc1wty0fkkg6.whl -O torch-1.10.0-cp36-cp36m-linux_aarch64.whl
+pip3 install torch-1.10.0-cp36-cp36m-linux_aarch64.whl
+
+# install torchvision v0.11.0 (takes 1 hr to build)
+sudo apt install -y libjpeg-dev zlib1g-dev
+git clone --branch v0.11.0 https://github.com/pytorch/vision torchvision
+cd torchvision
+pip3 install .
+
+# install requirements (takes at least 1 hr to build opencv)
+pip3 install -r jetson_nano_requirements.txt
+
+# add Python executables to PATH to use gdown
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc 
+source ~/.bashrc
 
 # download weights (with gdown installed)
-gdown https://drive.google.com/file/d/1zU_9Ut5movnX8pI4XTOvfEBSQbgMZdvA
+gdown --fuzzy -O lraspp_weights.ckpt https://drive.google.com/open?id=1zU_9Ut5movnX8pI4XTOvfEBSQbgMZdvA
 
-# begin mobile inference (on folder dataset)
-python3 predict_sequential.py --weights lraspp_weights.ckpt --sequence-dir MaSTr153 --output-dir output --mobile
+# apply numpy architecture fix to avoid segfault
+echo 'export OPENBLAS_CORETYPE=ARMV8' >> ~/.bashrc
+source ~/.bashrc
 
 # begin mobile inference (through gstreamer pipeline)
-python3 predict_gstreamer.py --weights lraspp_weights.ckpt
+# this takes in the camera stream and writes it to a file "out.flv"
+python3 predict_gstreamer.py --weights lraspp_weights.ckpt --fp16
 ```
+
+The `predict_sequential.py` script can also be used on the mobile inference network as follows.
+```
+# begin mobile inference (on folder dataset)
+# this functions similarly to predict_sequential.py on the full network
+python3 predict_sequential.py --weights lraspp_weights.ckpt --sequence-dir MaSTr153 --output-dir output --mobile --fp16
+``` 
