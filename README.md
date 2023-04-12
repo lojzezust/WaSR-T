@@ -138,7 +138,7 @@ We extend the MaSTr1325 dataset by providing the context frames (5 preceding fra
 ## Mobile WaSR-T
 *Contributed by @playertr*
 
-To enable the inference on devices with limited memory and compute resources, a light-weight, reduced-resolution version of WaSR-T has been trained. The mobile WaSR-T runs on the Jetson Nano embedded platform at around 13 FPS. Follow the [installation instructions](JETSON_INSTALL.MD) for a setup that has been tested on the 4GB original (pre-Orin) Jetson Nano developer kit.
+To enable the inference on devices with limited memory and compute resources, a light-weight, reduced-resolution version of WaSR-T has been trained. The mobile WaSR-T runs on the Jetson Nano embedded platform at around 13 FPS. Follow the [installation instructions](JETSON_INSTALL.md) for a setup that has been tested on the 4GB original (pre-Orin) Jetson Nano developer kit.
 
 To use or train the mobile version of WaSR-T use the `--mobile` and `--size 256 192` arguments in the training and inference scripts. For example to run the inference using the provided mobile weights and the `predict_sequential.py` script use the following.
 
@@ -157,7 +157,7 @@ We also provide an [example script](predict_gstreamer.py) for inference using a 
 python predict_gstreamer.py --weights path/to/weights.pth --fp16 --mobile --size 256 192
 ```
 
-### Model weights
+### Mobile weights
 
 Pre-trained model weights for the mobile version of WaSR-T. Performance is reported on the MODS dataset.
 
