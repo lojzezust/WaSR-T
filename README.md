@@ -10,6 +10,7 @@ Our work was presented at the *IROS 2022* conference in Kyoto, Japan.
     Comparison between WaSR (single-frame) and WaSR-T (temporal context) on hard examples.
 </p>
 
+**April 2023**: A mobile adaptation of WaSR-T [has been added](#mobile-wasr-t).
 
 ## About WaSR-T
 
@@ -87,15 +88,14 @@ mkdir sequence_images
 ffmpeg -i video.mp4 sequence_images/frame_%05d.jpg
 ```
 
-
 ## <a name="weights"></a>Model weights
 
 Currently available pretrained model weights. All models are evaluated on the MODS benchmark [[4](#ref-mods)]. F1 scores overall and inside the danger zone are reported in the table.
 
-| backbone   | T | dataset   | F1       | F1<sub>D</sub> | weights                                                                            |
-|------------|---|-----------|----------|----------|------------------------------------------------------------------------------------|
-| ResNet-101 | 5 | MaSTr1325 | 93.7     | 87.3     | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1325.pth) |
-| ResNet-101 | 5 | MaSTr1478 | **94.4** | **93.6** | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1478.pth) |
+| model   | T | training data   | Resolution | F1       | F1<sub>D</sub> | weights                                                                            |
+|---------|---|-----------------|------------|----------|----------------|------------------------------------------------------------------------------------|
+| regular (RN101) | 5 | MaSTr1325 | 512 x 384 | 93.7     | 87.3     | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1325.pth) |
+| regular (RN101) | 5 | MaSTr1478 | 512 x 384 | **94.4** | **93.6** | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1478.pth) |
 
 
 ## Model training
@@ -103,7 +103,7 @@ Currently available pretrained model weights. All models are evaluated on the MO
 To train your own models, use the `train.py` script. For example, to reproduce the results of our experiments use the following steps:
 
 1. Download and prepare the [MaSTr1325 dataset](https://box.vicos.si/borja/viamaro/index.html#mastr1325) (images and GT masks). Also download the context frames for the MaSTr1325 images [here](#data).
-2. Edit the dataset configuration files (`configs/mastr_1325_train.yaml`, `configs/mastr1325_extra` and `configs/mastr1325_val.yaml`) so that they correctly point to the dataset directories.
+2. Edit the dataset configuration files (`configs/mastr_1325_train.yaml`, `configs/mastr1325_val.yaml`) so that they correctly point to the dataset directories.
 3. Use the `train.py` to train the network.
 
 ```bash
@@ -135,6 +135,37 @@ We extend the MaSTr1325 dataset by providing the context frames (5 preceding fra
 - MaSTr1325 context frames: [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/mastr1325_context.zip)
 - MaSTr1478 extension data: [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/mastr153.zip)
 
+## Mobile WaSR-T
+*Contributed by @playertr*
+
+To enable the inference on devices with limited memory and compute resources, a light-weight, reduced-resolution version of WaSR-T has been trained. The mobile WaSR-T runs on the Jetson Nano embedded platform at around 13 FPS. Follow the [installation instructions](JETSON_INSTALL.MD) for a setup that has been tested on the 4GB original (pre-Orin) Jetson Nano developer kit.
+
+To use or train the mobile version of WaSR-T use the `--mobile` and `--size 256 192` arguments in the training and inference scripts. For example to run the inference using the provided mobile weights and the `predict_sequential.py` script use the following.
+
+```bash
+python predict_sequential.py \
+--sequence-dir examples/sequence \
+--weights path/to/weights.pth \
+--output-dir output/predictions \
+--mobile \
+--size 256 192
+```
+
+We also provide an [example script](predict_gstreamer.py) for inference using a *gstreamer* pipeline.
+
+```bash
+python predict_gstreamer.py --weights path/to/weights.pth --fp16 --mobile --size 256 192
+```
+
+### Model weights
+
+Pre-trained model weights for the mobile version of WaSR-T. Performance is reported on the MODS dataset.
+
+| model   | T | training data   | Resolution | F1       | F1<sub>D</sub> | weights                                                                            |
+|---------|---|-----------------|------------|----------|----------------|------------------------------------------------------------------------------------|
+| mobile | 5 | MaSTr1325 | 256 x 192 | 84.4 | 70.3 | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights-mobile/wasrt_mobile_mastr1325.pth) |
+| mobile | 5 | MaSTr1478 | 256 x 192 | 82.2 | 69.7 | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights-mobile/wasrt_mobile_mastr1478.pth) |
+
 ## <a name="cite"></a>Citation
 
 If you use this code, please cite our paper:
@@ -157,50 +188,3 @@ If you use this code, please cite our paper:
 <a name="ref-wasr"></a>[3] Bovcon, B., & Kristan, M. (2021). WaSR--A Water Segmentation and Refinement Maritime Obstacle Detection Network. IEEE Transactions on Cybernetics
 
 <a name="ref-mods"></a>[4] Bovcon, B., Muhovič, J., Vranac, D., Mozetič, D., Perš, J., & Kristan, M. (2021). MODS -- A USV-oriented object detection and obstacle segmentation benchmark.
-
-
-## Mobile Inference
-A reduced-resolution, smaller version of the WaSR-T network can be run on a Jetson Nano embedded platform at around 13 FPS. The instructions below have been tested on the 4 GB original (pre-Orin) Jetson Nano developer kit and show the steps needed for real-time inference that streams to a file. By modifying the gstreamer pipeline in `predict_gstreamer.py`, the live segmentation results can be sent to other destinations for processing. The PyTorch installation instructions are adapted from [here](https://docs.ultralytics.com/yolov5/jetson_nano/#install-pytorch-and-torchvision).
-
-```
-# install latest pip
-sudo apt-get install -y python3-pip
-pip3 install --upgrade pip
-
-# install torch v1.10.0
-cd ~
-sudo apt-get install -y libopenblas-base libopenmpi-dev
-wget https://nvidia.box.com/shared/static/fjtbno0vpo676a25cgvuqc1wty0fkkg6.whl -O torch-1.10.0-cp36-cp36m-linux_aarch64.whl
-pip3 install torch-1.10.0-cp36-cp36m-linux_aarch64.whl
-
-# install torchvision v0.11.0 (takes 1 hr to build)
-sudo apt install -y libjpeg-dev zlib1g-dev
-git clone --branch v0.11.0 https://github.com/pytorch/vision torchvision
-cd torchvision
-pip3 install .
-
-# install requirements (takes at least 1 hr to build opencv)
-pip3 install -r jetson_nano_requirements.txt
-
-# add Python executables to PATH to use gdown
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc 
-source ~/.bashrc
-
-# download weights (with gdown installed)
-gdown --fuzzy -O lraspp_weights.ckpt https://drive.google.com/open?id=1zU_9Ut5movnX8pI4XTOvfEBSQbgMZdvA
-
-# apply numpy architecture fix to avoid segfault
-echo 'export OPENBLAS_CORETYPE=ARMV8' >> ~/.bashrc
-source ~/.bashrc
-
-# begin mobile inference (through gstreamer pipeline)
-# this takes in the camera stream and writes it to a file "out.flv"
-python3 predict_gstreamer.py --weights lraspp_weights.ckpt --fp16 --mobile --size 256 192
-```
-
-The `predict_sequential.py` script can also be used on the mobile inference network as follows.
-```
-# begin mobile inference (on folder dataset)
-# this functions similarly to predict_sequential.py on the full network
-python3 predict_sequential.py --weights lraspp_weights.ckpt --sequence-dir MaSTr153 --output-dir output --mobile --fp16 --size 256 192
-``` 

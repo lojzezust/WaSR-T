@@ -26,7 +26,7 @@ DEVICE_BATCH_SIZE = 3
 TRAIN_CONFIG = 'configs/mastr1325_train.yaml'
 VAL_CONFIG = 'configs/mastr1325_val.yaml'
 NUM_CLASSES = 3
-PATIENCE = 5
+PATIENCE = None
 LOG_STEPS = 20
 NUM_WORKERS = 1
 NUM_GPUS = -1 # All visible GPUs
@@ -41,7 +41,7 @@ ADDITONAL_SAMPLES_RATIO = 0.5
 
 HIST_LEN = 5
 BACKBONE_GRAD_STEPS = 2
-SIZE = (384,512)
+SIZE = (512,384)
 
 def get_arguments(input_args=None):
     """Parse all the arguments provided from the CLI.
