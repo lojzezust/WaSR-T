@@ -136,7 +136,7 @@ We extend the MaSTr1325 dataset by providing the context frames (5 preceding fra
 - MaSTr1478 extension data: [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/mastr153.zip)
 
 ## Mobile WaSR-T
-*Contributed by @playertr*
+*Contributed by [@playertr](https://github.com/playertr)*
 
 To enable the inference on devices with limited memory and compute resources, a light-weight, reduced-resolution version of WaSR-T has been trained. The mobile WaSR-T runs on the Jetson Nano embedded platform at around 13 FPS. Follow the [installation instructions](JETSON_INSTALL.md) for a setup that has been tested on the 4GB original (pre-Orin) Jetson Nano developer kit.
 
