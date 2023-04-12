@@ -151,7 +151,7 @@ python predict_sequential.py \
 --size 256 192
 ```
 
-We also provide an [example script](predict_gstreamer.py) for inference using a *gstreamer* pipeline.
+We also provide an [example script](predict_gstreamer.py) for inference using a *gstreamer* pipeline. By modifying the gstreamer pipeline the live segmentation results can be sent to other destinations for processing.
 
 ```bash
 python predict_gstreamer.py --weights path/to/weights.pth --fp16 --mobile --size 256 192

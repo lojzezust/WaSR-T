@@ -1,7 +1,7 @@
 
 # Setup on Jeston Nano
 
-The install instructions below have been tested on the 4 GB original (pre-Orin) Jetson Nano developer kit.
+The install instructions below have been tested on the 4 GB original (pre-Orin) Jetson Nano developer kit. The PyTorch installation instructions are adapted from [here](https://docs.ultralytics.com/yolov5/jetson_nano/#install-pytorch-and-torchvision).
 
 ```
 # install latest pip
