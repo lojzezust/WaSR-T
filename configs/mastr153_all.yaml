@@ -1,5 +1,5 @@
 image_dir: /path/to/ds/images
 image_hist_dir: /path/to/ds/images_hist
 image_hist_len: 5
-image_list: /path/to/ds/all_list_hist.txt
+image_list: /path/to/ds/all_list.txt
 mask_dir: /path/to/ds/masks

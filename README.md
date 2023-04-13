@@ -103,7 +103,7 @@ Currently available pretrained model weights. All models are evaluated on the MO
 To train your own models, use the `train.py` script. For example, to reproduce the results of our experiments use the following steps:
 
 1. Download and prepare the [MaSTr1325 dataset](https://box.vicos.si/borja/viamaro/index.html#mastr1325) (images and GT masks). Also download the context frames for the MaSTr1325 images [here](#data).
-2. Edit the dataset configuration files (`configs/mastr_1325_train.yaml`, `configs/mastr1325_val.yaml`) so that they correctly point to the dataset directories.
+2. Edit the dataset configuration files (`configs/mastr_1325_train.yaml`, `configs/mastr1325_val.yaml` and `configs/mastr153_all.yaml`) so that they correctly point to the dataset directories.
 3. Use the `train.py` to train the network.
 
 ```bash
@@ -118,6 +118,8 @@ python train.py \
 ```
 
 **Note:** Model training requires a large amount of GPU memory (>11 GB per GPU). If you use smaller GPUs, you can reduce the memory consumption by decreasing the number of backbone backpropagation steps (`--backbone-grad-steps`) or using a smaller context length (`--hist-len`).
+
+**Note:** To reproduce training on MaSTr1478 use `--additional-train-config configs/mastr153_all.yaml` to specify the additional training examples.
 
 ### Logging and model weights
 
