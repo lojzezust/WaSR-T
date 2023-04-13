@@ -10,6 +10,7 @@ from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 
 from wasr_t.wasr_t import wasr_temporal_resnet101
+from wasr_t.mobile_wasr_t import wasr_temporal_lraspp_mobilenetv3
 from wasr_t.train import LitModel
 from wasr_t.utils import MainLoggerCollection, Option
 from wasr_t.callbacks import ModelExport
@@ -25,7 +26,7 @@ DEVICE_BATCH_SIZE = 3
 TRAIN_CONFIG = 'configs/mastr1325_train.yaml'
 VAL_CONFIG = 'configs/mastr1325_val.yaml'
 NUM_CLASSES = 3
-PATIENCE = 5
+PATIENCE = None
 LOG_STEPS = 20
 NUM_WORKERS = 1
 NUM_GPUS = -1 # All visible GPUs
@@ -40,6 +41,7 @@ ADDITONAL_SAMPLES_RATIO = 0.5
 
 HIST_LEN = 5
 BACKBONE_GRAD_STEPS = 2
+SIZE = (512,384)
 
 def get_arguments(input_args=None):
     """Parse all the arguments provided from the CLI.
@@ -99,9 +101,12 @@ def get_arguments(input_args=None):
                         help="Number of past frames to be considered in addition to the target frame (context length).")
     parser.add_argument("--backbone-grad-steps", default=BACKBONE_GRAD_STEPS, type=int,
                         help="How far into the past the backbone gradients are propagated. 1 means gradients are only propagated through the target frame.")
-
     parser.add_argument("--resume-from", type=str, default=None,
                         help="Resume training from specified checkpoint.")
+    parser.add_argument("--mobile", action='store_true',
+                    help="Use smaller network network for mobile inference.")
+    parser.add_argument("--size", type=int, nargs=2,
+                    help='Input resolution used for training (Width, Height). Used like "--size 512 384".', default=SIZE)
 
     parser = LitModel.add_argparse_args(parser)
 
@@ -177,10 +182,17 @@ def train_wasrt(args):
     args.random_seed = pl.seed_everything(args.random_seed)
 
     normalize_t = PytorchHubNormalization()
+    normalize_t = T.Compose([
+        normalize_t,
+        T.Resize(tuple(args.size[::-1]))
+    ])
     data = DataModule(args, normalize_t)
 
     # Get model
-    model = wasr_temporal_resnet101(num_classes=args.num_classes, pretrained=args.pretrained, hist_len=args.hist_len, backbone_grad_steps=args.backbone_grad_steps)
+    if args.mobile:
+        model = wasr_temporal_lraspp_mobilenetv3(num_classes=args.num_classes, pretrained=args.pretrained, hist_len=args.hist_len, backbone_grad_steps=args.backbone_grad_steps)
+    else:
+        model = wasr_temporal_resnet101(num_classes=args.num_classes, pretrained=args.pretrained, hist_len=args.hist_len, backbone_grad_steps=args.backbone_grad_steps)
 
     if args.pretrained_weights is not None:
         print(f"Loading weights from: {args.pretrained_weights}")

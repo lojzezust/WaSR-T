@@ -10,6 +10,7 @@ Our work was presented at the *IROS 2022* conference in Kyoto, Japan.
     Comparison between WaSR (single-frame) and WaSR-T (temporal context) on hard examples.
 </p>
 
+**April 2023**: A mobile adaptation of WaSR-T [has been added](#mobile-wasr-t).
 
 ## About WaSR-T
 
@@ -87,15 +88,14 @@ mkdir sequence_images
 ffmpeg -i video.mp4 sequence_images/frame_%05d.jpg
 ```
 
-
 ## <a name="weights"></a>Model weights
 
 Currently available pretrained model weights. All models are evaluated on the MODS benchmark [[4](#ref-mods)]. F1 scores overall and inside the danger zone are reported in the table.
 
-| backbone   | T | dataset   | F1       | F1<sub>D</sub> | weights                                                                            |
-|------------|---|-----------|----------|----------|------------------------------------------------------------------------------------|
-| ResNet-101 | 5 | MaSTr1325 | 93.7     | 87.3     | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1325.pth) |
-| ResNet-101 | 5 | MaSTr1478 | **94.4** | **93.6** | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1478.pth) |
+| model   | T | training data   | Resolution | F1       | F1<sub>D</sub> | weights                                                                            |
+|---------|---|-----------------|------------|----------|----------------|------------------------------------------------------------------------------------|
+| regular (RN101) | 5 | MaSTr1325 | 512 x 384 | 93.7     | 87.3     | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1325.pth) |
+| regular (RN101) | 5 | MaSTr1478 | 512 x 384 | **94.4** | **93.6** | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/wasrt_mastr1478.pth) |
 
 
 ## Model training
@@ -103,7 +103,7 @@ Currently available pretrained model weights. All models are evaluated on the MO
 To train your own models, use the `train.py` script. For example, to reproduce the results of our experiments use the following steps:
 
 1. Download and prepare the [MaSTr1325 dataset](https://box.vicos.si/borja/viamaro/index.html#mastr1325) (images and GT masks). Also download the context frames for the MaSTr1325 images [here](#data).
-2. Edit the dataset configuration files (`configs/mastr_1325_train.yaml`, `configs/mastr1325_extra` and `configs/mastr1325_val.yaml`) so that they correctly point to the dataset directories.
+2. Edit the dataset configuration files (`configs/mastr_1325_train.yaml`, `configs/mastr1325_val.yaml`) so that they correctly point to the dataset directories.
 3. Use the `train.py` to train the network.
 
 ```bash
@@ -134,6 +134,37 @@ tensorboard --logdir output/logs/model_name
 We extend the MaSTr1325 dataset by providing the context frames (5 preceding frames). We also extend the dataset with additional hard examples to form MaSTr1478.
 - MaSTr1325 context frames: [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/mastr1325_context.zip)
 - MaSTr1478 extension data: [link](https://github.com/lojzezust/WaSR-T/releases/download/weights/mastr153.zip)
+
+## Mobile WaSR-T
+*Contributed by [@playertr](https://github.com/playertr)*
+
+To enable the inference on devices with limited memory and compute resources, a light-weight, reduced-resolution version of WaSR-T has been trained. The mobile WaSR-T runs on the Jetson Nano embedded platform at around 13 FPS. Follow the [installation instructions](JETSON_INSTALL.md) for a setup that has been tested on the 4GB original (pre-Orin) Jetson Nano developer kit.
+
+To use or train the mobile version of WaSR-T use the `--mobile` and `--size 256 192` arguments in the training and inference scripts. For example to run the inference using the provided mobile weights and the `predict_sequential.py` script use the following.
+
+```bash
+python predict_sequential.py \
+--sequence-dir examples/sequence \
+--weights path/to/weights.pth \
+--output-dir output/predictions \
+--mobile \
+--size 256 192
+```
+
+We also provide an [example script](predict_gstreamer.py) for inference using a *gstreamer* pipeline. By modifying the gstreamer pipeline the live segmentation results can be sent to other destinations for processing.
+
+```bash
+python predict_gstreamer.py --weights path/to/weights.pth --fp16 --mobile --size 256 192
+```
+
+### Mobile weights
+
+Pre-trained model weights for the mobile version of WaSR-T. Performance is reported on the MODS dataset.
+
+| model   | T | training data   | Resolution | F1       | F1<sub>D</sub> | weights                                                                            |
+|---------|---|-----------------|------------|----------|----------------|------------------------------------------------------------------------------------|
+| mobile | 5 | MaSTr1325 | 256 x 192 | 84.4 | 70.3 | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights-mobile/wasrt_mobile_mastr1325.pth) |
+| mobile | 5 | MaSTr1478 | 256 x 192 | 82.2 | 69.7 | [link](https://github.com/lojzezust/WaSR-T/releases/download/weights-mobile/wasrt_mobile_mastr1478.pth) |
 
 ## <a name="cite"></a>Citation
 
