@@ -56,7 +56,8 @@ for image in sequence:
     # image is a [1,3,H,W] tensor
     output = model({'image': image})
 ```
-**Note**: If you run inference on multiple sequences you must call `clear_state()` on the model to clear the buffer before moving to a new sequence. Otherwise the context of the last frames of the previous sequence will be used, which may lead to faulty predictions.
+> [!NOTE]
+> If you run inference on multiple sequences you must call `clear_state()` on the model to clear the buffer before moving to a new sequence. Otherwise the context of the last frames of the previous sequence will be used, which may lead to faulty predictions.
 
 Example of unrolled operation:
 ```python
@@ -117,9 +118,11 @@ python train.py \
 --epochs 100
 ```
 
-**Note:** Model training requires a large amount of GPU memory (>11 GB per GPU). If you use smaller GPUs, you can reduce the memory consumption by decreasing the number of backbone backpropagation steps (`--backbone-grad-steps`) or using a smaller context length (`--hist-len`).
+> [!NOTE]
+> Model training requires a large amount of GPU memory (>11 GB per GPU). If you use smaller GPUs, you can reduce the memory consumption by decreasing the number of backbone backpropagation steps (`--backbone-grad-steps`) or using a smaller context length (`--hist-len`).
 
-**Note:** To reproduce training on MaSTr1478 use `--additional-train-config configs/mastr153_all.yaml` to specify the additional training examples.
+> [!NOTE]
+> To reproduce training on MaSTr1478 use `--additional-train-config configs/mastr153_all.yaml` to specify the additional training examples.
 
 ### Logging and model weights
 
