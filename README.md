@@ -1,5 +1,9 @@
 # WaSR-T: Temporal Context for Robust Maritime Obstacle Detection
-[[`paper`](https://arxiv.org/abs/2203.05352)] [[`BibTeX`](#cite)] [[`weights`](#weights)] [[`data`](#data)]
+
+[![arxiv](https://img.shields.io/badge/paper-52b69a?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2203.05352)
+[![weights](https://img.shields.io/badge/weights-34a0a4?style=for-the-badge&logo=DocuSign&logoColor=white)](#weights)
+[![data](https://img.shields.io/badge/data-168aad?style=for-the-badge&logo=DocuSign&logoColor=white)](#data)
+[![cite](https://img.shields.io/badge/bibtex-1a759f?style=for-the-badge&logo=overleaf&logoColor=white)](#cite)
 
 This is the official PyTorch implementation of the [WaSR-T network](https://arxiv.org/abs/2203.05352) [[1](#ref-wasrt)]. Contains scripts for training and running the network and weights pretrained on the MaSTr1325 [[2](#ref-mastr)] (and MaSTr1478) dataset. 
 
